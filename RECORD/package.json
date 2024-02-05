@@ -1,0 +1,44 @@
+{
+  "name": "record",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./Window/main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron .",
+    "build": "electron-builder"
+  },
+  "author": "Gerome Blanco",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^28.1.0",
+    "electron-builder": "^24.9.1"
+  },
+  "dependencies": {
+    "sweetalert2": "^11.10.2"
+  },
+  "build": {
+    "appId": "Gerome-Blanco-App",
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "icon": "icon.ico"
+    },
+    "asar": false,
+    "files": [
+      "Backend/",
+      "Frontend/",
+      "Window/",
+      "**"
+    ],
+    "nsis": {
+      "oneClick": false,
+      "installerIcon": "icon.ico",
+      "uninstallerIcon": "icon.ico",
+      "uninstallDisplayName": "ASLRC Record Attendance Uninstaller",
+      "license": "license.md",
+      "allowToChangeInstallationDirectory": true
+    }
+  }
+}

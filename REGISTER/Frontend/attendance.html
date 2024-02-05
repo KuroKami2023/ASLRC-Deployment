@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <title>View Attendance</title>
+    <link rel="stylesheet" href="./style.css">
+    <link rel="stylesheet" href="./attendance.css">
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg bg-body-dark">
+        <div class="container-fluid">
+          <h4>
+            <img src="images/logo.png" class="dlogo" alt="">
+            AUTOMATED SYSTEM FOR LEARNING RESOURCE CENTER
+        </h4>
+            <ul class="navbar-nav">
+              <li class="nav-item">
+                <a class="nav-link" aria-current="page" href="index.html">Home</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="userinformations.html">User Informations</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="attendance.html">Attendance</a>
+              </li>
+            </ul>
+        </div>
+      </nav>
+
+      <div class="container">
+        <div class="search-container">
+          <label for="selectDate" class="selectlabel">Select Date: </label>
+          <select class="form-select" aria-label="Default select example">
+              <option selected>Select Date</option>
+          </select>
+          <label for="searchDate">Search Date: </label>
+          <input type="text" id="search-date" class="txtsearch" placeholder="MM-DD-YYYY">
+          <label for="searchUser">Search User: </label>
+          <input type="text" id="search-user" class="txtsearch" placeholder="Name / ID Number">
+        </div>
+        
+        <div class="table-container">
+            <div class="floating-button-container">
+              <button type="button" id="printButton" class="btn btn-outline-success">Print</button>
+            </div>
+            <table class="table table-dark table-hover" style="text-align: center;">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>ID Number</th>
+                        <th>Program</th>
+                        <th>Year</th>
+                        <th>Time In</th>
+                        <th>Time Out</th>
+                    </tr>
+                </thead>
+                <tbody id="userTable">
+
+                </tbody>
+            </table>
+        </div>
+        
+    </div>
+
+    <div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Add User</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addUserForm" style="font-family: 'Times New Roman', Times, serif">
+                        <input type="text" id="addName" class="form-control" placeholder="Name" required>
+                        <input type="text" id="addID" class="form-control" placeholder="ID Number" required>
+                        <input type="text" id="addAddress" class="form-control" placeholder="Address" required>
+                        <input type="text" id="addContact" class="form-control" placeholder="Contact Number" required>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="closeModal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="attendance.js"></script>
+</body>
+</html>

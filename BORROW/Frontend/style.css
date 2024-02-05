@@ -1,0 +1,72 @@
+@import url('https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    height: 100vh;
+    font-family: 'Frank Ruhl Libre', serif;
+    overflow: hidden;
+    /*background: rgb(45,41,41);
+    background: linear-gradient(36deg, rgba(45,41,41,1) 42%, rgba(68,68,65,1) 77%);*/
+    background-image: url(images/bgimg.jpg);
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+.container {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.card {
+    margin: 1rem;
+    text-align: center;
+    border-style: solid;
+    border-color: black;
+    width: 50rem;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.navbar-nav {
+    margin-left: auto;
+}
+
+.navbar-nav .nav-item {
+    margin-right: 15px; 
+    transition: color 0.5s ease; 
+}
+
+.navbar-nav .nav-item :hover {
+    color: #380cff;
+}
+
+.nav-link {
+    color: white;
+}
+
+.navbar {
+    color: white;
+}
+
+.dlogo {
+    width: 40px;
+    height: 40px;
+}
+
+.navbar {
+    background-color: #212429 !important;
+}
+
+.tablebox {
+    text-align: center;
+}
+
+.card-img-top {
+    height: 18rem;
+}

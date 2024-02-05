@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <title>Book Informations</title>
+    <link rel="stylesheet" href="user.css">
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg bg-body-dark">
+        <div class="container-fluid">
+          <h4>
+            <img src="images/logo.png" class="dlogo" alt="">
+            AUTOMATED SYSTEM FOR LEARNING RESOURCE CENTER
+        </h4>
+            <ul class="navbar-nav">
+              <li class="nav-item">
+                <a class="nav-link" aria-current="page" href="index.html">Home</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="books.html">Books</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="borrow.html">Borrow History</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="return.html">Return History</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="duedate.html">Overdue</a>
+              </li>
+            </ul>
+        </div>
+      </nav>
+
+    <div class="container">
+        <div class="search-container">
+            <label for="searchBook">Search Book: </label>
+            <input type="text" id="search-book" class="txtsearch" placeholder="Accession Number / Book Number / Title" style="width: 50rem;">
+        </div>
+        
+        <div class="table-container">
+            <table class="table table-dark table-bordered table-hover" style="text-align: center;">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>Accession Number</th>
+                        <th>Book Number</th>
+                        <th>Title</th>
+                        <th>Author</th>
+                        <th>On Shelf</th>
+                        <th>Update | Delete</th>
+                    </tr>
+                </thead>
+                <tbody id="userTable">
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="modal fade" id="updateBookModal" tabindex="-1" aria-labelledby="updateBookModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="updateBookModalLabel">Update Book</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="updateBookForm">
+                        <div class="mb-3">
+                            <label for="updateAccNum" class="form-label">Accession Number</label>
+                            <input type="text" id="updateAccNum" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="updateBookNum" class="form-label">Book Number</label>
+                            <input type="text" id="updateBookNum" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="updateTitle" class="form-label">Title</label>
+                            <input type="text" id="updateTitle" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="updateAuthor" class="form-label">Author</label>
+                            <input type="text" id="updateAuthor" class="form-control" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Update</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="books.js"></script>
+</body>
+</html>
