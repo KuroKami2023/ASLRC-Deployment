@@ -1,23 +1,139 @@
-const fs = require('fs');
-const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
+const Swal = require('sweetalert2');
 
 document.addEventListener("DOMContentLoaded", function () {
     const dbAttendance = new sqlite3.Database('\\\\DESKTOP-0ACG64R\\Record\\attendance.db');
     const dbUser = new sqlite3.Database('\\\\DESKTOP-0ACG64R\\Backend\\users.db');
     const selectDate = document.querySelector('.form-select');
     const userTable = document.getElementById('userTable');
+    
+    const startDateInput = document.getElementById('start-date');
+    const endDateInput = document.getElementById('end-date');
 
-    printButton.addEventListener('click', function () {
-        const selectedTable = selectDate.value;
+    startDateInput.addEventListener('change', function () {
+        updateTableWithDateRange(dbAttendance, dbUser, startDateInput.value, endDateInput.value);
+    });
 
-        if (selectedTable !== 'Select Date') {
-            printAttendanceTable(dbAttendance, dbUser, selectedTable);
+    endDateInput.addEventListener('change', function () {
+        updateTableWithDateRange(dbAttendance, dbUser, startDateInput.value, endDateInput.value);
+    });
+    const printAllButton = document.getElementById('printallButton');
+    const printButton = document.getElementById('printButton');
+
+    printAllButton.addEventListener('click', function () {
+        const startDate = startDateInput.value;
+        const endDate = endDateInput.value;
+        if (startDate && endDate) {
+            printTableWithDateRange(startDate, endDate);
         } else {
-            console.log("Please select a valid date before printing.");
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Please select both start and end dates.'
+            });
         }
     });
 
+    printButton.addEventListener('click', function () {
+        const selectedDate = selectDate.value;
+        if (selectedDate && selectedDate !== 'Select Date') {
+            printTableForSelectedDate(selectedDate);
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Please select date from the select date option only.'
+            });
+        }
+    });
+
+    function printTableWithDateRange(startDate, endDate) {
+        const formattedStartDate = formatDateForTableName(startDate);
+        const formattedEndDate = formatDateForTableName(endDate);
+        const tableContent = document.getElementById('userTable').outerHTML;
+        
+        let printedContent = '';
+        
+        const headerRow = document.getElementById('tablee').outerHTML;
+        printedContent += headerRow;
+
+        const tableRows = document.querySelectorAll('#userTable tbody tr');
+        tableRows.forEach(row => {
+            printedContent += row.outerHTML;
+        });
+
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write(`
+            <html>
+                <head>
+                    <title>Attendance Report: ${formattedStartDate.replace(/_/g, '-')} to ${formattedEndDate.replace(/_/g, '-')}</title>
+                    <style>
+                        ${getPrintStyles()}
+                    </style>
+                </head>
+                <body>
+                    <h1>Attendance Report: ${formattedStartDate.replace(/_/g, '-')} to ${formattedEndDate.replace(/_/g, '-')}</h1>
+                    <table class="table table-dark table-hover" style="text-align: center;">
+                    ${printedContent}    
+                    ${tableContent}
+                    </table>
+                </body>
+            </html>
+        `);
+        printWindow.document.close();
+        printWindow.print();
+    }
+
+    function printTableForSelectedDate(selectedDate) {
+        const printedTitle = `Attendance for ${selectedDate.replace('attendance_', '').replace(/_/g, '-')}`;
+        const tableContent = document.getElementById('userTable').outerHTML;
+
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write(`
+            <html>
+                <head>
+                    <title>${printedTitle}</title>
+                    <style>
+                        ${getPrintStyles()}
+                    </style>
+                </head>
+                <body>
+                    <h1>${printedTitle}</h1>
+                    <table class="table table-dark table-hover" style="text-align: center;">
+                        ${tableContent}
+                    </table>
+                </body>
+            </html>
+        `);
+        printWindow.document.close();
+        printWindow.print();
+    }
+    
+    function getPrintStyles() {
+        return `
+            body {
+                font-family: Arial, sans-serif;
+            }
+            table {
+                border-collapse: collapse;
+                width: 100%;
+            }
+            th, td {
+                border: 1px solid #dddddd;
+                text-align: left;
+                padding: 8px;
+            }
+            th {
+                background-color: #f2f2f2;
+            }
+            tr:nth-child(even) {
+                background-color: #dddddd;
+            }
+        `;
+    }
+    
+    
+    
     selectDate.addEventListener('change', function () {
         const selectedTable = this.value;
         if (selectedTable !== 'Select Date') {
@@ -65,7 +181,78 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
+    function formatDateForTableName(date) {
+        const parts = date.split('-');
+        return `${parts[1]}_${parts[2]}_${parts[0]}`;
+    }
+    
+    function updateTableWithDateRange(dbAttendance, dbUser, startDate, endDate) {
+        if (startDate && endDate) {
+            const startDateTime = new Date(startDate).getTime();
+            const endDateTime = new Date(endDate).getTime();
+    
+            if (startDateTime <= endDateTime) {
+                const formattedStartDate = formatDateForTableName(startDate);
+                const formattedEndDate = formatDateForTableName(endDate);
+    
+                const dateRangeQuery = `
+                    SELECT name 
+                    FROM sqlite_master 
+                    WHERE type='table' 
+                        AND name != 'sqlite_sequence' 
+                        AND name >= 'attendance_${formattedStartDate}' 
+                        AND name <= 'attendance_${formattedEndDate}';
+                `;
+    
+                dbAttendance.all(dateRangeQuery, [], function (err, results) {
+                    if (err) {
+                        console.error("Error executing date range query:", err.message);
+                        return;
+                    }
+    
+                    userTable.innerHTML = '';
+    
+                    const headerRow = document.createElement('tr');
+                    headerRow.innerHTML = `<th colspan="7" style="background: darkgray;">Attendance from ${formattedStartDate.replace(/_/g, '-')} to ${formattedEndDate.replace(/_/g, '-')}</th>`;
+                    userTable.appendChild(headerRow);
+    
+                    results.forEach((tableResult) => {
+                        const tableName = tableResult.name;
+    
+                        const attendanceQuery = `SELECT *, '${tableName}' as tableName FROM ${tableName}`;
+                        dbAttendance.all(attendanceQuery, [], function (attendanceErr, attendanceResults) {
+                            if (attendanceErr) {
+                                console.error("Error executing attendance query:", attendanceErr.message);
+                                return;
+                            }
+                            attendanceResults.forEach((row) => {
+                                dbUser.get(`SELECT * FROM user WHERE IDNumber = ?`, [row.IDNumber], function (err, user) {
+                                    if (err) {
+                                        console.error("Error executing user query:", err.message);
+                                        return;
+                                    }
+    
+                                    const tr = document.createElement('tr');
+                                    tr.innerHTML = `<td>${user ? user.Name || '' : ''}</td>
+                                                    <td>${row.IDNumber || ''}</td>
+                                                    <td>${user ? user.Program || '' : ''}</td>
+                                                    <td>${user ? user.Year || '' : ''}</td>
+                                                    <td>${row.time_in || ''}</td>
+                                                    <td>${row.time_out || ''}</td>
+                                                    <td>${row.tableName.replace('attendance_', '').replace(/_/g, '-') || ''}</td>`;
+                                    userTable.appendChild(tr);
+                                });
+                            });
+                        });
+                    });
+                });
+            } else {
+                console.error("Start date should be before or equal to end date.");
+            }
+        }
+    }
 });
+
 
 function openDatabase(dbPath) {
     const db = new sqlite3.Database(dbPath);
@@ -174,12 +361,14 @@ searchUser.addEventListener('input', function () {
     tableRows.forEach(row => {
         const idNumberCell = row.querySelector('td:first-child');
         const nameCell = row.querySelector('td:nth-child(2)');
+        const programCell = row.querySelector('td:nth-child(3)');
 
-        if (nameCell && idNumberCell) {
+        if (nameCell && idNumberCell && programCell) {
             const name = nameCell.textContent.toLowerCase();
             const idNumber = idNumberCell.textContent.toLowerCase();
+            const program = programCell.textContent.toLowerCase();
 
-            if (name.includes(searchTerm) || idNumber.includes(searchTerm)) {
+            if (name.includes(searchTerm) || idNumber.includes(searchTerm) || program.includes(searchTerm)) {
                 row.style.display = '';
             } else {
                 row.style.display = 'none';
@@ -187,70 +376,3 @@ searchUser.addEventListener('input', function () {
         }
     });
 });
-
-function printAttendanceTable(dbAttendance, dbUser, tableName) {
-    const attendanceQuery = `SELECT * FROM ${tableName}`;
-    const userQuery = `SELECT Name, IDNumber, Program, Year FROM user WHERE IDNumber = ?`;
-
-    dbAttendance.get(`SELECT name FROM sqlite_master WHERE type='table' AND name=?;`, [tableName], function (tableErr, tableResult) {
-        if (tableErr) {
-            console.error("Error checking table existence:", tableErr.message);
-            return;
-        }
-
-        if (!tableResult) {
-            console.error(`Table ${tableName} does not exist in the attendance database.`);
-            return;
-        }
-
-        dbAttendance.all(attendanceQuery, [], function (err, results) {
-            if (err) {
-                console.error("Error executing attendance query:", err.message);
-                return;
-            }
-
-            const userPromises = [];
-
-            for (const row of results) {
-                const userPromise = new Promise((resolve, reject) => {
-                    dbUser.get(userQuery, [row.IDNumber], function (userErr, userRow) {
-                        if (userErr) {
-                            console.error("Error executing user query:", userErr.message);
-                            reject(userErr);
-                        }
-
-                        resolve({ row, userRow });
-                    });
-                });
-
-                userPromises.push(userPromise);
-            }
-
-            Promise.all(userPromises)
-                .then((resultsWithUser) => {
-                    let tableContent = `<h2>Attendance Report: ${tableName.replace('attendance', '').replace('_', '').replace(/_/g, '-')}</h2>` +
-                    '<table border="1" style="width:100%; text-align: center;">';
-                    tableContent += '<tr><th>Name</th><th>IDNumber</th><th>Program</th><th>Year</th><th>Time In</th><th>Time Out</th></tr>';
-
-                    for (const { row, userRow } of resultsWithUser) {
-                        tableContent += `<tr><td>${userRow ? userRow.Name || '' : ''}</td>
-                                         <td>${userRow ? userRow.IDNumber || '' : ''}</td>
-                                         <td>${userRow ? userRow.Program || '' : ''}</td>
-                                         <td>${userRow ? userRow.Year || '' : ''}</td>
-                                         <td>${row.time_in || ''}</td>
-                                         <td>${row.time_out || ''}</td></tr>`;
-                    }
-
-                    tableContent += '</table>';
-
-                    const printWindow = window.open('', '_blank');
-                    printWindow.document.write(tableContent);
-                    printWindow.document.close();
-                    printWindow.print();
-                })
-                .catch((error) => {
-                    console.error("Error in user queries:", error.message);
-                });
-        });
-    });
-}

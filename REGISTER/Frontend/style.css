@@ -66,3 +66,28 @@ body {
 .tablebox {
     text-align: center;
 }
+
+.newcontainer {
+    background-color: #212429;
+    padding: 21px;
+    color: white;
+    border-radius: 5px;
+    border-style: solid;
+    border-color: white;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#start-date {
+    width: 200px;
+    margin-right: 50px;
+    margin-left: 10px;
+}
+
+#end-date {
+    width: 200px;
+    margin-left: 10px;
+    margin-right: 50px;
+}

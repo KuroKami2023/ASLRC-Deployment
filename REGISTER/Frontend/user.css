@@ -33,7 +33,7 @@ body {
 .table {
     width: 100%;
     height: auto !important;
-    overflow-y: auto;
+    overflow-y: scroll !important;
 }
 
 .table-container {

@@ -43,14 +43,23 @@
           <label for="searchUser">Search User: </label>
           <input type="text" id="search-user" class="txtsearch" placeholder="Name / ID Number">
         </div>
+
+        <div class="newcontainer">
+            <label for="startDate" class="lbldate">Start Date: </label>
+            <input type="date" id="start-date" class="form-control">
+            <label for="endDate" class="lbldate">End Date: </label>
+            <input type="date" id="end-date" class="form-control">
+            <button type="button" id="printallButton" class="btn btn-outline-success">Print All Selected Dates</button>
+        </div>
+        
         
         <div class="table-container">
             <div class="floating-button-container">
-              <button type="button" id="printButton" class="btn btn-outline-success">Print</button>
+              <button type="button" id="printButton" class="btn btn-outline-success">Print Selected Date Only</button>
             </div>
             <table class="table table-dark table-hover" style="text-align: center;">
                 <thead>
-                    <tr>
+                    <tr id="tablee">
                         <th>Name</th>
                         <th>ID Number</th>
                         <th>Program</th>
