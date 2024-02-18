@@ -1,9 +1,12 @@
 const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
 const Swal = require('sweetalert2');
+const XLSX = require('xlsx');
 
 const dbPath = path.join(__dirname, '../Backend/Borrow/books.db');
 const db = new sqlite3.Database(dbPath);
+
+const fileInput = document.getElementById('fileInput');
 
 window.addEventListener('DOMContentLoaded', () => {
     const table = document.getElementById('userTable');
@@ -174,6 +177,72 @@ function updateBook(bookNumber) {
     });
 }
 
+function handleFileInputChange(event) {
+    const fileInput = event.target;
+    const file = fileInput.files[0];
+
+    if (file) {
+        const reader = new FileReader();
+
+        reader.onload = function (e) {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: 'array' });
+
+            const sheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[sheetName];
+
+            const headers = ['Call', 'Title', 'Author', 'Barcode'];
+
+            const rows = XLSX.utils.sheet_to_json(worksheet, { header: headers });
+
+            rows.forEach(row => {
+
+                const call = row['Call'] || row[0];
+                const title = row['Title'] || row[1];
+                const author = row['Author'] || row[2];
+                const barcode = row['Barcode'] || row[3];
+
+                if (title !== "Title") {
+                    const existingBookQuery = 'SELECT * FROM books WHERE bookNumber = ? OR bookTitle = ?';
+                    db.get(existingBookQuery, [call, title], (err, existingBook) => {
+                        if (err) {
+                            console.error(err.message);
+                            return;
+                        }
+
+                        if (!existingBook) {
+                            db.run('INSERT INTO books (bookNumber, bookTitle, author, onShelf) VALUES (?, ?, ?, ?)',
+                            [call, title, author, "Yes"],
+                            function (err) {
+                                if (err) {
+                                    console.error(err.message);
+                                } else {
+                                    const bookID = this.lastID;
+                                    db.run('INSERT INTO accnum (bookNumber, accNum) VALUES (?, ?)',
+                                        [call, barcode],
+                                        function (err) {
+                                            if (err) {
+                                                console.error(err.message);
+                                            }
+                                        });
+                                }
+                            });
+
+                            } else {
+                        }
+                    });
+                } else {
+                    console.log(`Skipping row with Title "${title}".`);
+                }
+            });
+
+            showSuccess('Data imported successfully');
+        };
+
+        reader.readAsArrayBuffer(file);
+    }
+}
+fileInput.addEventListener('change', handleFileInputChange);
 
 
 
